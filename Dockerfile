@@ -1,6 +1,6 @@
 FROM node:lts-alpine
 
-ENV PATH $PATH:/usr/local/itms/bin
+# ENV PATH $PATH:/usr/local/itms/bin
 
 # Install Ruby
 RUN apk update && apk upgrade && apk --update add --no-cache \
@@ -33,31 +33,24 @@ RUN apk update && apk upgrade && apk --update add --no-cache \
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
-ENV JAVA_HOME /opt/openjdk-13
-ENV PATH $JAVA_HOME/bin:$PATH
 
-# Install Java (openjdk)
-# https://jdk.java.net/
-ENV JAVA_VERSION 13-ea+19
-ENV JAVA_URL https://download.java.net/java/early_access/alpine/19/binaries/openjdk-13-ea+19_linux-x64-musl_bin.tar.gz
-ENV JAVA_SHA256 010ea985fba7e3d89a9170545c4e697da983cffc442b84e65dba3baa771299a5
-# "For Alpine Linux, builds are produced on a reduced schedule and may not be in sync with the other platforms."
+# Install JRE
+RUN ZULU_PACK=zulu-8-azure-jre_8.38.0.13-8.0.212-linux_musl_x64.tar.gz && \
+    INSTALL_DIR=/usr/lib/jvm && \
+    BIN_DIR=/usr/bin && \
+    MAN_DIR=/usr/share/man/man1 && \
+    ZULU_DIR=$( basename ${ZULU_PACK} .tar.gz ) && \
+    apk --no-cache add ca-certificates libgcc libstdc++ ttf-dejavu wget && \
+    wget -q http://repos.azul.com/azure-only/zulu/packages/zulu-8/8u212/$ZULU_PACK && \
+    mkdir -p ${INSTALL_DIR} && \
+    tar -xf ./${ZULU_PACK} -C ${INSTALL_DIR} && rm -f ${ZULU_PACK} && \
+    cd ${BIN_DIR} && \
+    find ${INSTALL_DIR}/${ZULU_DIR}/bin -type f -perm -a=x -exec ln -s {} . \; && \
+    mkdir -p ${MAN_DIR} && \
+    cd ${MAN_DIR} && \
+    find ${INSTALL_DIR}/${ZULU_DIR}/man/man1 -type f -name "*.1" -exec ln -s {} . \;
 
-RUN set -eux; \
-    \
-    wget -O /openjdk.tgz "$JAVA_URL"; \
-    echo "$JAVA_SHA256 */openjdk.tgz" | sha256sum -c -; \
-    mkdir -p "$JAVA_HOME"; \
-    tar --extract --file /openjdk.tgz --directory "$JAVA_HOME" --strip-components 1; \
-    rm /openjdk.tgz; \
-    \
-  # https://github.com/docker-library/openjdk/issues/212#issuecomment-420979840
-  # https://openjdk.java.net/jeps/341
-    java -Xshare:dump; \
-    \
-  # basic smoke test
-    java --version; \
-    javac --version
+ENV JAVA_HOME=/usr/lib/jvm/${ZULU_DIR}
 
 # Extract the iTMSTransporter binary from the Windows installer
 RUN curl https://itunesconnect.apple.com/transporter/1.9.8/iTMSTransporterToolInstaller_1.9.8.exe > installer.exe \
