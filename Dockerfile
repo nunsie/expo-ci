@@ -23,7 +23,7 @@ RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
     p7zip-full \
     &&  echo 'gem: --no-document' > /etc/gemrc
 
-RUN sudo apt install cmake clang-4.0 bison flex xz-utils libfuse-dev libudev-dev pkg-config libc6-dev-i386 linux-headers-amd64 libcap2-bin git libcairo2-dev libgl1-mesa-dev libtiff5-dev libfreetype6-dev libxml2-dev libegl1-mesa-dev libfontconfig1-dev libbsd-dev
+RUN apt-get install -y cmake clang-4.0 bison flex xz-utils libfuse-dev libudev-dev pkg-config libc6-dev-i386 linux-headers-amd64 libcap2-bin git libcairo2-dev libgl1-mesa-dev libtiff5-dev libfreetype6-dev libxml2-dev libegl1-mesa-dev libfontconfig1-dev libbsd-dev
 
 RUN git clone --recursive https://github.com/darlinghq/darling.git
 
