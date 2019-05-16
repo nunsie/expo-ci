@@ -27,7 +27,7 @@ RUN apt-get install -y cmake clang-4.0 bison flex xz-utils libfuse-dev libudev-d
 
 RUN git clone --recursive https://github.com/darlinghq/darling.git
 
-RUN cd darling && mkdir build && cd build && cmake .. && sudo make install
+RUN cd darling && mkdir build && cd build && cmake .. && make install
 
 # Install Fastlane
 RUN gem install fastlane
